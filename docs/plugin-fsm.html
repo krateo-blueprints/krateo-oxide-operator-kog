@@ -1,0 +1,32 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{margin:0;box-sizing:border-box;font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;}
+body{width:1240px;height:470px;background:radial-gradient(1000px 460px at 50% -10%,#123039 0%,#0a0e14 60%,#070a0f 100%);color:#e8eef2;padding:48px 56px;}
+h2{font-size:29px;font-weight:800;letter-spacing:-.5px;} h2 .g{color:#48d597;}
+.cap{color:#7f95a3;font-size:16px;margin:6px 0 46px;}
+.row{display:flex;align-items:center;justify-content:center;gap:0;}
+.st{background:#0e151d;border:1.5px solid #223140;border-radius:16px;padding:20px 24px;text-align:center;min-width:220px;}
+.st.run{border-color:#2f8d6a;background:linear-gradient(180deg,#0f231d,#0d1a17);}
+.st .b{font:700 18px ui-monospace,Menlo,monospace;color:#eef4f8;letter-spacing:1px;}
+.st.run .b{color:#48d597;}
+.st .s{color:#8398a6;font-size:14px;margin-top:6px;}
+.arr{padding:0 22px;text-align:center;color:#3a5768;}
+.arr .a{font-size:30px;line-height:1;} .arr .l{display:block;font:600 13px ui-monospace,Menlo,monospace;color:#48d597;margin-top:6px;}
+.loop{margin-top:40px;text-align:center;color:#6f8592;font-size:15px;}
+.loop .k{color:#48d597;font-family:ui-monospace,Menlo,monospace;font-weight:600;}
+.self{display:inline-block;color:#5f7382;font-size:12.5px;border:1px dashed #2a3a48;border-radius:20px;padding:5px 12px;margin-top:14px;}
+</style></head><body>
+  <h2>The plugin as a <span class="g">finite-state machine</span></h2>
+  <div class="cap">GET is an idempotent reconcile. On <em>every</em> controller resync it runs these transitions, so the instance converges to running no matter the apply order.</div>
+  <div class="row">
+    <div class="st"><div class="b">CREATED</div><div class="s">stopped · boot disk detached</div></div>
+    <div class="arr"><div class="a">▶</div><div class="l">boot disk ready → attach</div></div>
+    <div class="st"><div class="b">ATTACHED</div><div class="s">stopped · boot disk attached</div></div>
+    <div class="arr"><div class="a">▶</div><div class="l">start</div></div>
+    <div class="st run"><div class="b">RUNNING 🟢</div><div class="s">converged — no-op on next GET</div></div>
+  </div>
+  <div class="loop">
+    <span class="self">↺ disk not ready yet → wait for the next GET</span>
+    &nbsp;&nbsp;&nbsp;
+    <span class="k">GET</span> fires every resync interval — the state machine re-runs and repairs any drift.
+  </div>
+</body></html>

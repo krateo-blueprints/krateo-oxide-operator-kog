@@ -1,0 +1,28 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{margin:0;box-sizing:border-box;font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;}
+body{width:1240px;height:440px;background:radial-gradient(1000px 460px at 50% -10%,#2a1620 0%,#0a0e14 62%,#070a0f 100%);color:#e8eef2;padding:48px 56px;}
+h2{font-size:29px;font-weight:800;letter-spacing:-.5px;} h2 .r{color:#f2758c;}
+.cap{color:#7f95a3;font-size:16px;margin:6px 0 40px;}
+.lane{display:flex;align-items:center;gap:0;background:#0e141b;border:1px solid #212e3a;border-radius:16px;padding:22px 26px;margin-bottom:22px;}
+.tag{font:700 14px ui-monospace,Menlo,monospace;color:#8fb0c2;min-width:230px;}
+.tag .c{color:#48d597;display:block;font-size:16px;margin-bottom:2px;}
+.step{color:#c6d2db;font-size:16px;} .m{font-family:ui-monospace,Menlo,monospace;background:#182430;border-radius:6px;padding:2px 7px;font-size:14px;color:#dfe9f0;}
+.ar{color:#4a5f6e;padding:0 14px;font-size:20px;}
+.bad{color:#f2758c;font-weight:700;}
+.foot{margin-top:12px;text-align:center;color:#93a6b3;font-size:16px;}
+.foot b{color:#f2758c;}
+</style></head><body>
+  <h2><span class="r">int64</span> broke it twice — in opposite directions</h2>
+  <div class="cap">Byte-sized fields are int64. Two different Krateo components mishandled that same type in two different ways.</div>
+  <div class="lane">
+    <div class="tag"><span class="c">oasgen-provider</span>OpenAPI → JSON schema</div>
+    <span class="ar">▶</span>
+    <div class="step"><span class="m">format: int64</span> dropped &nbsp;▶&nbsp; CRD defaults to <span class="m">int32</span> &nbsp;▶&nbsp; <span class="bad">20 GiB rejected at admission</span></div>
+  </div>
+  <div class="lane">
+    <div class="tag"><span class="c">rest-dynamic-controller</span>drift comparison</div>
+    <span class="ar">▶</span>
+    <div class="step">CR <span class="m">int64</span> vs response <span class="m">float64</span> &nbsp;▶&nbsp; "values differ" &nbsp;▶&nbsp; <span class="bad">never reaches READY</span></div>
+  </div>
+  <div class="foot">One <b>dropped</b> int64, the other <b>mis-compared</b> it — same failure mode, mirror-image bugs.</div>
+</body></html>
