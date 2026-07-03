@@ -13,16 +13,23 @@ I wanted to write this:
 ```yaml
 apiVersion: oxide.ogen.krateo.io/v1alpha1
 kind: OxideInstance
-metadata: { name: demo-vm, namespace: krateo-system }
+metadata:
+  name: demo-vm
+  namespace: krateo-system
 spec:
-  configurationRef: { name: oxide-api, namespace: krateo-system }
+  configurationRef:
+    name: oxide-api
+    namespace: krateo-system
   project: demo
   name: demo-vm
   memory: 4294967296   # 4 GiB
   ncpus: 2
   start: true
-  boot_disk: { type: attach, name: demo-boot }
-  external_ips: [ { type: ephemeral } ]
+  boot_disk:
+    type: attach
+    name: demo-boot
+  external_ips:
+    - type: ephemeral
 ```
 
 …run `kubectl apply`, and watch a real virtual machine boot in my Oxide silo. No hand-written controller.

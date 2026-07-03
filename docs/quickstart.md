@@ -104,17 +104,25 @@ kubectl apply -f https://raw.githubusercontent.com/braghettos/krateo-oxide-opera
 ---
 apiVersion: oxide.ogen.krateo.io/v1alpha1
 kind: OxideProject
-metadata: { name: demo, namespace: krateo-system }
+metadata:
+  name: demo
+  namespace: krateo-system
 spec:
-  configurationRef: { name: oxide-api, namespace: krateo-system }
+  configurationRef:
+    name: oxide-api
+    namespace: krateo-system
   name: demo
   description: "Krateo-managed demo project"
 ---
 apiVersion: oxide.ogen.krateo.io/v1alpha1
 kind: OxideVpc
-metadata: { name: demo-vpc, namespace: krateo-system }
+metadata:
+  name: demo-vpc
+  namespace: krateo-system
 spec:
-  configurationRef: { name: oxide-api, namespace: krateo-system }
+  configurationRef:
+    name: oxide-api
+    namespace: krateo-system
   project: demo
   name: demo-vpc
   description: "Demo VPC"
@@ -122,22 +130,32 @@ spec:
 ---
 apiVersion: oxide.ogen.krateo.io/v1alpha1
 kind: OxideDisk
-metadata: { name: demo-boot, namespace: krateo-system }
+metadata:
+  name: demo-boot
+  namespace: krateo-system
 spec:
-  configurationRef: { name: oxide-api, namespace: krateo-system }
+  configurationRef:
+    name: oxide-api
+    namespace: krateo-system
   project: demo
   name: demo-boot
   description: "20 GiB blank boot disk"
   size: 21474836480            # 20 GiB in bytes — an int64 value
   disk_backend:
     type: distributed
-    disk_source: { type: blank, block_size: 4096 }
+    disk_source:
+      type: blank
+      block_size: 4096
 ---
 apiVersion: oxide.ogen.krateo.io/v1alpha1
 kind: OxideInstance
-metadata: { name: demo-vm, namespace: krateo-system }
+metadata:
+  name: demo-vm
+  namespace: krateo-system
 spec:
-  configurationRef: { name: oxide-api, namespace: krateo-system }
+  configurationRef:
+    name: oxide-api
+    namespace: krateo-system
   project: demo
   name: demo-vm
   description: "Krateo-managed instance"
@@ -145,7 +163,9 @@ spec:
   memory: 4294967296          # 4 GiB in bytes — an int64 value
   ncpus: 2
   start: true
-  boot_disk: { type: attach, name: demo-boot }
+  boot_disk:
+    type: attach
+    name: demo-boot
   external_ips:
     - type: ephemeral
 ```
