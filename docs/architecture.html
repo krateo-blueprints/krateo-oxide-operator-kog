@@ -1,0 +1,46 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{margin:0;box-sizing:border-box;font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;}
+body{width:1240px;height:660px;background:radial-gradient(1000px 500px at 50% -10%,#123039 0%,#0a0e14 60%,#070a0f 100%);color:#e8eef2;padding:52px 56px;}
+h2{font-size:30px;font-weight:800;letter-spacing:-.5px;margin-bottom:6px;}
+h2 .g{color:#48d597;}
+.cap{color:#7f95a3;font-size:17px;margin-bottom:34px;}
+.lane{margin-bottom:26px;}
+.lbl{font:600 13px ui-monospace,Menlo,monospace;letter-spacing:1.5px;text-transform:uppercase;color:#5f7embed;color:#5f7382;margin-bottom:14px;}
+.row{display:flex;align-items:center;gap:0;}
+.box{background:#0e151d;border:1px solid #223140;border-radius:14px;padding:18px 22px;min-width:250px;box-shadow:0 12px 30px rgba(0,0,0,.35);}
+.box.accent{border-color:#2f6d5a;background:linear-gradient(180deg,#0f1c1a,#0d1418);}
+.box.oxide{border-color:#2f6d5a;}
+.box .t{font:700 20px ui-monospace,Menlo,monospace;}
+.box .t.gr{color:#48d597;} .box .t.wh{color:#eef4f8;}
+.box .s{color:#8398a6;font-size:15px;margin-top:5px;}
+.arr{color:#3a5768;font-size:30px;padding:0 16px;flex:0 0 auto;}
+.arr .l{display:block;font-size:11px;color:#5f7382;letter-spacing:1px;text-align:center;margin-top:2px;}
+.down{display:flex;justify-content:flex-end;padding:6px 0;}
+.down .a{color:#3a5768;font-size:15px;margin-right:120px;text-align:center;}
+.down .a b{color:#48d597;font-weight:600;font-size:12px;letter-spacing:1px;display:block;}
+</style></head><body>
+  <h2>How a Kubernetes CR becomes a running <span class="g">Oxide VM</span></h2>
+  <div class="cap">No hand-written controller — a curated OpenAPI subset generates the CRDs, and a generic controller (plus a small plugin) reconciles them against the silo.</div>
+
+  <div class="lane">
+    <div class="lbl">Generate · once</div>
+    <div class="row">
+      <div class="box"><div class="t wh">RestDefinition</div><div class="s">curated OpenAPI subset</div></div>
+      <div class="arr">▶<span class="l">oasgen-provider</span></div>
+      <div class="box accent"><div class="t gr">CRD pair</div><div class="s">&lt;Kind&gt;Configuration + &lt;Kind&gt;</div></div>
+    </div>
+  </div>
+
+  <div class="down"><div class="a">│<br>▼<b>defines the API you apply</b></div></div>
+
+  <div class="lane">
+    <div class="lbl">Reconcile · every apply</div>
+    <div class="row">
+      <div class="box"><div class="t wh">OxideInstance</div><div class="s">your Kubernetes YAML</div></div>
+      <div class="arr">▶<span class="l">observe / create</span></div>
+      <div class="box accent"><div class="t gr">rest-dynamic-controller</div><div class="s">+ oxide-instance plugin&nbsp;·&nbsp;attach + start FSM</div></div>
+      <div class="arr">▶<span class="l">REST</span></div>
+      <div class="box oxide"><div class="t gr">Oxide silo</div><div class="s">running VM 🟢</div></div>
+    </div>
+  </div>
+</body></html>
