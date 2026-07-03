@@ -174,14 +174,12 @@ kubectl get oxideproject,oxidevpc,oxidedisk,oxideinstance -n krateo-system
 ```
 
 ```
-NAME                                     READY
-oxideproject.oxide.ogen.krateo.io/demo   True
-oxidevpc.oxide.ogen.krateo.io/demo-vpc   True
-oxidedisk.oxide.ogen.krateo.io/demo-boot   True
+NAME                                         READY
+oxideproject.oxide.ogen.krateo.io/demo       True
+oxidevpc.oxide.ogen.krateo.io/demo-vpc       True
+oxidedisk.oxide.ogen.krateo.io/demo-boot     True
 oxideinstance.oxide.ogen.krateo.io/demo-vm   True
 ```
-
-![All four resources READY=True in Kubernetes](screenshots/kubectl-ready.png)
 
 Cross-check in Oxide — the `demo` project, the 20 GiB `demo-boot` disk and the 2-vCPU / 4-GiB `demo-vm`
 instance are all there:
@@ -192,11 +190,12 @@ oxide disk list --project demo
 oxide instance list --project demo
 ```
 
-…or open the Oxide web console:
+…or open the Oxide web console. The instance is **running**, booting the imported image, with the 20 GiB
+boot disk attached:
 
-![The demo project in the Oxide console](screenshots/oxide-project.png)
+![demo-vm running in the Oxide console with its boot disk attached](screenshots/oxide-instance.png)
 
-![The demo-vm instance in the Oxide console](screenshots/oxide-instance.png)
+![demo-boot 20 GiB attached to demo-vm in the Oxide console](screenshots/oxide-disks.png)
 
 ## 7. Clean up
 
