@@ -59,8 +59,63 @@ components:
           type: string
           description: Base64 cloud-init user data.
         boot_disk:
-          type: string
-          description: Disk to boot from (attached or created with the instance).
+          type: object
+          description: Disk to boot from, created-and-attached or attached with the instance.
+          required:
+          - type
+          - name
+          properties:
+            type:
+              type: string
+              enum:
+              - create
+              - attach
+            name:
+              type: string
+              description: Disk name (existing disk for attach; new disk for create).
+              minLength: 1
+              maxLength: 63
+            description:
+              type: string
+              description: Description (create only).
+            size:
+              type: integer
+              format: int64
+              description: Disk size in bytes (create only).
+            disk_backend:
+              type: object
+              description: The source of a Disk's blocks (create only).
+              required:
+              - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                  - distributed
+                  - local
+                disk_source:
+                  type: object
+                  required:
+                  - type
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                      - blank
+                      - snapshot
+                      - image
+                    block_size:
+                      type: integer
+                      enum:
+                      - 512
+                      - 2048
+                      - 4096
+                    image_id:
+                      type: string
+                      format: uuid
+                    snapshot_id:
+                      type: string
+                      format: uuid
         auto_restart_policy:
           type: string
           enum:
