@@ -103,3 +103,24 @@ resourceGroup: oxide.ogen.krateo.io
 
 # verbose logging on the generated connectors (annotation krateo.io/connector-verbose)
 verbose: false
+
+# ---------------------------------------------------------------------------
+# OxideInstance convergence plugin
+# ---------------------------------------------------------------------------
+# Oxide needs two actions the generic rest-dynamic-controller can't express to
+# bring an instance up — attach the boot disk and start — and Oxide's create-time
+# boot_disk attach silently no-ops on a not-yet-ready disk, so applying a disk and
+# an instance together races into a stopped instance with a detached boot disk.
+#
+# When enabled, this deploys a small "plugin" (wrapper web service) and points the
+# OxideInstance OAS servers[0].url at it instead of the raw silo API. The plugin
+# forwards the bearer token to oxide.apiUrl and makes GET an idempotent reconcile
+# (attach the boot disk, then start once attached), so the instance converges to
+# running regardless of apply ordering. See braghettos/oxide-rest-dynamic-controller-plugin.
+instancePlugin:
+  enabled: false
+  image:
+    repository: ghcr.io/braghettos/oxide-rest-dynamic-controller-plugin
+    tag: "0.1.0"
+    pullPolicy: IfNotPresent
+  replicaCount: 1

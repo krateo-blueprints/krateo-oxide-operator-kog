@@ -12,7 +12,10 @@ This walkthrough was verified end-to-end against a live Oxide preview silo on a 
 >   `format: int64` instead of being downgraded to `int32` (which rejects any value above ~2 GiB).
 > - `rest-dynamic-controller` **≥ 0.9.1** — compares numeric fields by value, so an `int64` in the CR
 >   and the same number decoded as `float64` from the API response no longer look like drift.
-> - this chart — models the instance `boot_disk` as an object (`{type, name}`), matching Oxide's API.
+> - this chart — models the instance `boot_disk` as an object (`{type, name}`), matching Oxide's API, and
+>   ships an optional **convergence plugin** (`instancePlugin.enabled`) that attaches the boot disk and
+>   starts the instance on reconcile, so applying the disk and instance together self-heals to a running
+>   VM regardless of ordering.
 
 ## Prerequisites
 
@@ -66,8 +69,14 @@ kubectl -n krateo-system rollout status deploy/oasgen-provider
 
 ```bash
 helm install oxide-kog oci://ghcr.io/braghettos/charts/krateo-oxide-operator-kog \
-  -n krateo-system --set oxide.apiUrl=https://oxide.example.com
+  -n krateo-system --set oxide.apiUrl=https://oxide.example.com \
+  --set instancePlugin.enabled=true
 ```
+
+`instancePlugin.enabled=true` deploys the OxideInstance convergence plugin and points the instance
+controller at it, so an instance attaches its boot disk and starts on reconcile — you can apply the disk
+and instance together and it self-heals to a running VM (see step 5). Leave it off if you only need
+create/get/delete semantics.
 
 This creates 19 `RestDefinition`s. `oasgen-provider` turns each into a CRD pair — a `<Kind>Configuration`
 and the resource `<Kind>` — and spins up its controller. Wait for them to register:
@@ -142,15 +151,21 @@ spec:
 ```
 
 ```bash
-kubectl apply -f demo.yaml
+kubectl apply -f demo.yaml     # apply all four at once
 ```
+
+The disk and instance are applied together on purpose: with `instancePlugin.enabled=true` the instance
+attaches its boot disk and starts on reconcile, so it self-heals to running once the disk is provisioned —
+no ordering required. (Without the plugin, apply the disk first, wait for `READY`, then the instance:
+Oxide's create-time boot-disk attach no-ops on a not-yet-ready disk.)
 
 Conventions to know:
 - `spec.name` is the natural key Oxide addresses the resource by; the server UUID lands in `status.id`.
 - project-scoped resources take `spec.project`; VPC children take `spec.vpc`; network interfaces take
   `spec.instance`.
 - The boot disk here uses a `blank` source (no OS). Point `disk_source` at an `image`
-  (`type: image, image_id: <uuid>`) to boot a real OS.
+  (`type: image, image_id: <uuid>`) to boot a real OS — import one with `oxide disk import` (it uploads a
+  raw image and creates a bootable image in one command).
 
 ## 6. Verify
 

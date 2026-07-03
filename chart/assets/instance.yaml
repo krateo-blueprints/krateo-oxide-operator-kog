@@ -11,8 +11,13 @@ info:
     `id` is read-only. The http/bearer security scheme makes oasgen-provider emit a OxideInstanceConfiguration
     CRD carrying the API token.'
 servers:
+{{- if .Values.instancePlugin.enabled }}
+- url: 'http://{{ .Release.Name }}-instance-plugin.{{ .Release.Namespace }}.svc.cluster.local:8080'
+  description: OxideInstance convergence plugin (forwards to oxide.apiUrl, adds attach+start).
+{{- else }}
 - url: '{{ .Values.oxide.apiUrl }}'
   description: Base URL of the Oxide silo API (no trailing slash).
+{{- end }}
 security:
 - bearer: []
 components:
