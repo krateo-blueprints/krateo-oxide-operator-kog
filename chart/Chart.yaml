@@ -10,7 +10,7 @@ description: >-
   Oxide API token is supplied via a Kubernetes Secret referenced by each
   generated Configuration CR.
 type: application
-version: 0.1.0
+version: CHART_VERSION
 appVersion: "2026060800.0.0"
 home: https://oxide.computer/
 icon: https://raw.githubusercontent.com/krateo-platformops/krateo/main/docs/media/logo.svg
