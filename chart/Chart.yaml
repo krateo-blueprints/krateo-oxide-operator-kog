@@ -13,7 +13,7 @@ type: application
 version: 0.1.0
 appVersion: "2026060800.0.0"
 home: https://oxide.computer/
-icon: https://raw.githubusercontent.com/krateoplatformops/krateo/main/docs/media/logo.svg
+icon: https://raw.githubusercontent.com/krateo-platformops/krateo/main/docs/media/logo.svg
 keywords:
   - krateo
   - kog
@@ -30,7 +30,7 @@ annotations:
 sources:
   - https://github.com/krateo-blueprints/krateo-oxide-operator-kog
   - https://github.com/oxidecomputer/omicron/tree/main/openapi/nexus
-  - https://github.com/krateoplatformops/oasgen-provider
-  - https://github.com/krateoplatformops/rest-dynamic-controller
+  - https://github.com/krateo-platformops/oasgen-provider
+  - https://github.com/krateo-platformops/rest-dynamic-controller
 maintainers:
   - name: krateo

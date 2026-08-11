@@ -14,9 +14,9 @@ subset per resource and Krateo's generic `rest-dynamic-controller`.
 
 A single Helm chart (`chart/`) plus a sibling `CompositionDefinition` that registers it with Krateo.
 Installing it emits **19 `RestDefinition`s** (one per `chart/assets/<key>.yaml`); Krateo's
-[`oasgen-provider`](https://github.com/krateoplatformops/oasgen-provider) turns each into a CRD pair — a
+[`oasgen-provider`](https://github.com/krateo-platformops/oasgen-provider) turns each into a CRD pair — a
 `<Kind>` (the resource) and a `<Kind>Configuration` (carrying the API-token reference) — and
-[`rest-dynamic-controller`](https://github.com/krateoplatformops/rest-dynamic-controller) reconciles each
+[`rest-dynamic-controller`](https://github.com/krateo-platformops/rest-dynamic-controller) reconciles each
 CR against the Oxide Region API. There is no controller code in this repo; `oasgen-provider` and
 `rest-dynamic-controller` ship with Krateo ≥ 2.5.1.
 

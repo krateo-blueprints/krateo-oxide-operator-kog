@@ -14,8 +14,8 @@ Cloud resources — projects, instances, disks, snapshots, images, VPCs and thei
 floating IPs, network interfaces, affinity and anti-affinity groups, internet gateways, SSH keys,
 certificates, silos, IP pools and subnet pools — into **native Kubernetes custom resources**. There is
 **no hand-written controller**: each resource is a hand-curated OpenAPI subset of the Oxide Region API,
-turned into a CRD pair by [`oasgen-provider`](https://github.com/krateoplatformops/oasgen-provider) and
-reconciled by [`rest-dynamic-controller`](https://github.com/krateoplatformops/rest-dynamic-controller).
+turned into a CRD pair by [`oasgen-provider`](https://github.com/krateo-platformops/oasgen-provider) and
+reconciled by [`rest-dynamic-controller`](https://github.com/krateo-platformops/rest-dynamic-controller).
 
 The repo is a single Helm chart (`chart/`) plus a sibling `CompositionDefinition` that registers it with
 Krateo. Installing the chart emits **19 `RestDefinition`s** (one per `chart/assets/<key>.yaml`); each

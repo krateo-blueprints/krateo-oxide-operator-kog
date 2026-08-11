@@ -10,8 +10,8 @@ timestamp: 2026-08-11T00:00:00Z
 # Overview
 
 This chart is a thin, declarative packaging layer. It contains **no controller code**: all reconciliation
-is done by Krateo's generic [`oasgen-provider`](https://github.com/krateoplatformops/oasgen-provider) and
-[`rest-dynamic-controller`](https://github.com/krateoplatformops/rest-dynamic-controller), which must
+is done by Krateo's generic [`oasgen-provider`](https://github.com/krateo-platformops/oasgen-provider) and
+[`rest-dynamic-controller`](https://github.com/krateo-platformops/rest-dynamic-controller), which must
 already be installed in the cluster (they ship with Krateo ≥ 2.5.1). What the chart ships is a curated
 OpenAPI subset per Oxide resource and the `RestDefinition` that binds it.
 
