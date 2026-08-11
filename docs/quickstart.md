@@ -57,9 +57,9 @@ resource. Install it with the fixed images:
 
 ```bash
 helm install oasgen-provider krateo/oasgen-provider -n krateo-system \
-  --set image.repository=ghcr.io/braghettos/krateo-oasgen-provider \
+  --set image.repository=ghcr.io/krateo-blueprints/krateo-oasgen-provider \
   --set image.tag=0.10.4 \
-  --set rdc.image.repository=ghcr.io/braghettos/krateo-rest-dynamic-controller \
+  --set rdc.image.repository=ghcr.io/krateo-blueprints/krateo-rest-dynamic-controller \
   --set rdc.image.tag=0.9.1
 
 kubectl -n krateo-system rollout status deploy/oasgen-provider

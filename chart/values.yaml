@@ -116,11 +116,11 @@ verbose: false
 # OxideInstance OAS servers[0].url at it instead of the raw silo API. The plugin
 # forwards the bearer token to oxide.apiUrl and makes GET an idempotent reconcile
 # (attach the boot disk, then start once attached), so the instance converges to
-# running regardless of apply ordering. See braghettos/oxide-rest-dynamic-controller-plugin.
+# running regardless of apply ordering. See krateo-blueprints/oxide-rest-dynamic-controller-plugin.
 instancePlugin:
   enabled: false
   image:
-    repository: ghcr.io/braghettos/oxide-rest-dynamic-controller-plugin
+    repository: ghcr.io/krateo-blueprints/oxide-rest-dynamic-controller-plugin
     tag: "0.1.0"
     pullPolicy: IfNotPresent
   replicaCount: 1
