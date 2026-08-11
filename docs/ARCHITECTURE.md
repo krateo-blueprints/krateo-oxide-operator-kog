@@ -1,3 +1,12 @@
+---
+type: Architecture
+title: Architecture — krateo-oxide-operator-kog
+description: krateo-oxide-operator-kog — architecture reference.
+resource: https://github.com/krateo-blueprints/krateo-oxide-operator-kog
+tags: [architecture, krateo-blueprints]
+timestamp: 2026-08-11T00:00:00Z
+---
+
 # Architecture
 
 This chart is a thin, declarative packaging layer. It contains **no controller code**: all reconciliation

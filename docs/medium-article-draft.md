@@ -1,3 +1,12 @@
+---
+type: Architecture
+title: Medium Article Draft — krateo-oxide-operator-kog
+description: krateo-oxide-operator-kog — medium article draft reference.
+resource: https://github.com/krateo-blueprints/krateo-oxide-operator-kog
+tags: [architecture, krateo-blueprints]
+timestamp: 2026-08-11T00:00:00Z
+---
+
 # Declaring Oxide Cloud VMs as Kubernetes YAML with Krateo — and the four `int64` gremlins I met along the way
 
 *A hands-on story of turning the [Oxide](https://oxide.computer/) Cloud API into native Kubernetes

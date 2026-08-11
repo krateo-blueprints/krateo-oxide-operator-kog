@@ -1,3 +1,12 @@
+---
+type: Architecture
+title: Quickstart — krateo-oxide-operator-kog
+description: krateo-oxide-operator-kog — quickstart reference.
+resource: https://github.com/krateo-blueprints/krateo-oxide-operator-kog
+tags: [architecture, krateo-blueprints]
+timestamp: 2026-08-11T00:00:00Z
+---
+
 # Quickstart
 
 Declare a **project, a VPC, a disk and an instance** as plain Kubernetes resources and watch Krateo
