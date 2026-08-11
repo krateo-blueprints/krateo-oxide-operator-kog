@@ -100,7 +100,7 @@ Index: [docs/examples.md](docs/examples.md).
 ## Develop & release
 
 The chart is published to `oci://ghcr.io/krateo-blueprints/charts/krateo-oxide-operator-kog` by
-`.github/workflows/release-chart.yaml` on a SemVer git tag matching `chart/Chart.yaml`'s `version` (e.g.
+`.github/workflows/release-tag.yaml` on a SemVer git tag matching `chart/Chart.yaml`'s `version` (e.g.
 `0.1.0`, no `v` prefix); the workflow guards that the tag equals the chart version, `helm lint`s,
 `helm package`s and pushes to GHCR. After publishing, bump `compositiondefinition.yaml`'s
 `spec.chart.version` to the released version. `appVersion` records the Oxide Region API version the OAS
