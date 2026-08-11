@@ -1,0 +1,30 @@
+# krateo-oxide-operator-kog — LLM doc index (pinned: 0.1.0)
+# One line per file; regenerate the pin on release. Read files at the tag that matches the running
+# build: the chart version is CompositionDefinition.spec.chart.version, and appVersion records the
+# Oxide Region API version the OAS subsets were curated against.
+docs/index.md: the map — what the KOG blueprint is + links to the whole bundle and the repo layout
+docs/overview.md: the asset→ConfigMap→RestDefinition→CRD→HTTP pipeline, the 19 resources, why each RestDefinition looks the way it does, token-scope tiers, modelling choices, the OxideInstance plugin
+docs/usage.md: mint the token Secret, install the operator layer (chart or Composition), wire the Configuration CRs, declare a project/VPC/disk/instance, verify, clean up
+docs/configuration.md: the whole values.yaml surface — oxide.apiUrl, the token contract, the 19 per-resource toggles, resourceGroup/verbose, the instance plugin
+docs/api.md: the CRD contract — the RestDefinition inputs, the generated <Kind> and <Kind>Configuration CRDs, and the CompositionDefinition the blueprint registers as
+docs/examples.md: index of the runnable examples
+docs/release.md: how the chart ships — a SemVer tag matching Chart.yaml drives helm package + push to GHCR
+docs/log.md: curated history
+docs/quickstart.md: the end-to-end walkthrough with screenshots (project/VPC/disk/instance to READY on a live silo)
+docs/ARCHITECTURE.md: the long-form architecture note — the pipeline, the RestDefinition rationale, the modelling choices, regenerating the assets
+examples/oxide-project-instance/README.md: the runnable end-to-end example — install the KOG, wire the token, declare a project/VPC/disk/instance
+examples/oxide-project-instance/composition.yaml: the KrateoOxideOperatorKog Composition CR that installs the operator layer
+examples/oxide-project-instance/00-configurations.yaml: the 19 <Kind>Configuration CRs (token wiring)
+examples/oxide-project-instance/10-project-and-instance.yaml: the end-to-end project + VPC + disk + instance resource CRs
+# Source (read at the same tag; the docs above are derived from these):
+chart/Chart.yaml: chart metadata — name/version/appVersion (the Oxide API version), keywords, sources
+chart/values.yaml: every value with its rationale in comments — oxide.apiUrl, auth, the 19 restDefinitions, resourceGroup, verbose, instancePlugin
+chart/values.schema.json: the typed values schema
+chart/templates/configmaps.yaml: embeds each assets/<key>.yaml OAS into a ConfigMap (tpl-resolves oxide.apiUrl)
+chart/templates/rd-project.yaml: a representative RestDefinition — verbs, identifiers, excludedSpecFields, requestFieldMapping
+chart/templates/instance-plugin.yaml: the optional OxideInstance convergence plugin Deployment + Service
+chart/assets/disk.yaml: a representative curated OAS subset (flattened tagged-union disk_backend, int64 size)
+chart/samples/00-configurations.yaml: the ready-made <Kind>Configuration CRs
+chart/samples/10-project-and-instance.yaml: the end-to-end resource CRs
+compositiondefinition.yaml: this blueprint's own registration (spec.chart.version = the published chart)
+examples/composition.yaml: the Composition CR that installs the operator layer through Krateo

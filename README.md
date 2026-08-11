@@ -4,140 +4,107 @@
   <img src="docs/oxide-logo.svg" alt="Oxide Computer" height="80"/>
 </p>
 
-> 📖 **[Quickstart](docs/quickstart.md)** — install the operator and watch a project and instance appear in the Oxide console.
-
-
 # krateo-oxide-operator-kog
 
-Krateo Operator Generator (KOG) packaging that turns **[Oxide Computer](https://oxide.computer/) Cloud**
+A Krateo Operator Generator (KOG) blueprint that turns [Oxide Computer](https://oxide.computer/) Cloud
 resources into native Kubernetes custom resources — no hand-written controller, just a curated OpenAPI
-subset per resource and a generic `rest-dynamic-controller`.
+subset per resource and Krateo's generic `rest-dynamic-controller`.
 
-It builds on [`oasgen-provider`](https://github.com/krateoplatformops/oasgen-provider) and
-[`rest-dynamic-controller`](https://github.com/krateoplatformops/rest-dynamic-controller): each
-`RestDefinition` references a hand-curated OAS subset of the
-[Oxide Region API](https://github.com/oxidecomputer/omicron/tree/main/openapi/nexus), and oasgen-provider
-generates a CRD pair — a `<Kind>Configuration` (carrying the API-token reference) and the resource `<Kind>`
-itself — reconciled against your Oxide silo.
+## What is this
 
-## Resources
+A single Helm chart (`chart/`) plus a sibling `CompositionDefinition` that registers it with Krateo.
+Installing it emits **19 `RestDefinition`s** (one per `chart/assets/<key>.yaml`); Krateo's
+[`oasgen-provider`](https://github.com/krateo-platformops/oasgen-provider) turns each into a CRD pair — a
+`<Kind>` (the resource) and a `<Kind>Configuration` (carrying the API-token reference) — and
+[`rest-dynamic-controller`](https://github.com/krateo-platformops/rest-dynamic-controller) reconciles each
+CR against the Oxide Region API. There is no controller code in this repo; `oasgen-provider` and
+`rest-dynamic-controller` ship with Krateo ≥ 2.5.1.
 
-19 RestDefinitions, one per `chart/assets/<key>.yaml`. Kinds are prefixed `Oxide` to avoid crdgen
-collisions with same-named lowercase body/path/query identifiers (e.g. kind `Vpc` vs the `vpc` query param).
+The 19 kinds (all prefixed `Oxide` to avoid crdgen collisions): `OxideProject`, `OxideInstance`,
+`OxideDisk`, `OxideSnapshot`, `OxideImage`, `OxideVpc`, `OxideVpcSubnet`, `OxideVpcRouter`,
+`OxideRouterRoute`, `OxideFloatingIp`, `OxideNetworkInterface`, `OxideAffinityGroup`,
+`OxideAntiAffinityGroup`, `OxideInternetGateway`, `OxideSshKey`, `OxideCertificate`, `OxideSilo`,
+`OxideIpPool`, `OxideSubnetPool`. See [docs/overview.md](docs/overview.md) for the full resource table and
+the asset→CRD pipeline.
 
-| Kind | Oxide API | Verbs | Scope params | Token scope |
-|------|-----------|-------|--------------|-------------|
-| `OxideProject` | `/v1/projects` | create / get / update / delete | — | silo |
-| `OxideInstance` | `/v1/instances` | create / get / update / delete | project | silo |
-| `OxideDisk` | `/v1/disks` | create / get / delete | project | silo |
-| `OxideSnapshot` | `/v1/snapshots` | create / get / delete | project | silo |
-| `OxideImage` | `/v1/images` | create / get / delete | project | silo |
-| `OxideVpc` | `/v1/vpcs` | create / get / update / delete | project | silo |
-| `OxideVpcSubnet` | `/v1/vpc-subnets` | create / get / update / delete | project, vpc | silo |
-| `OxideVpcRouter` | `/v1/vpc-routers` | create / get / update / delete | project, vpc | silo |
-| `OxideRouterRoute` | `/v1/vpc-router-routes` | create / get / update / delete | project, vpc, router | silo |
-| `OxideFloatingIp` | `/v1/floating-ips` | create / get / update / delete | project | silo |
-| `OxideNetworkInterface` | `/v1/network-interfaces` | create / get / update / delete | instance, project | silo |
-| `OxideAffinityGroup` | `/v1/affinity-groups` | create / get / update / delete | project | silo |
-| `OxideAntiAffinityGroup` | `/v1/anti-affinity-groups` | create / get / update / delete | project | silo |
-| `OxideInternetGateway` | `/v1/internet-gateways` | create / get / delete | project, vpc | silo |
-| `OxideSshKey` | `/v1/me/ssh-keys` | create / get / delete | — | silo-user |
-| `OxideCertificate` | `/v1/certificates` | create / get / delete | — | silo |
-| `OxideSilo` | `/v1/system/silos` | create / get / delete | — | fleet |
-| `OxideIpPool` | `/v1/system/ip-pools` | create / get / update / delete | — | fleet |
-| `OxideSubnetPool` | `/v1/system/subnet-pools` | create / get / update / delete | — | fleet |
-
-### How resources are addressed
-
-Oxide addresses every resource by its **user-supplied `name`** (a `name` unique within the parent
-collection). That name fills the path parameter on get/update/delete (`/v1/instances/{instance}`), so each
-RestDefinition maps the path placeholder back to `spec.name` via `requestFieldMapping` — no `findby` is
-needed (the natural key is known at creation time). The server-generated UUID is surfaced read-only in
-`status.id`.
-
-Resources nested under a parent are scoped by **query parameters** that oasgen-provider exposes as ordinary
-spec fields: `project` (project-scoped resources), `vpc` (VPC children), `router` (router routes),
-`instance` (network interfaces). Set them on the CR and rest-dynamic-controller sends them as `?project=…`.
-
-### Verbs and immutability
-
-Resources Oxide treats as immutable (disks, snapshots, images, internet gateways, SSH keys, certificates,
-silos) carry **no `update` verb** — change them by delete + recreate. Power/attach actions
-(`start`/`stop`/`reboot`, disk/IP attach-detach, IP-pool ranges, silo links) are single-fire RPCs outside
-KOG's declarative create/get/update/delete model and are intentionally not modelled here.
-
-## Auth: the Oxide API token
-
-Oxide authenticates with a long-lived **device access token** sent as `Authorization: Bearer <token>`.
-Because the token is long-lived, no rotation machinery (unlike the Keycloak KOG's short-lived admin tokens)
-is required — supply it once via a Secret that each generated `<Kind>Configuration` references through
-`spec.authentication.bearer.tokenRef`.
-
-```bash
-# Log in once with the Oxide CLI, then capture the token into a Secret.
-oxide auth login --host https://oxide.example.com
-
-kubectl create secret generic oxide-api-token \
-  --from-literal=token="$(oxide auth status --token)" -n krateo-system
-```
-
-The token's scope determines which resources you can manage: a silo collaborator token covers projects and
-everything inside them; the fleet-scoped resources (`OxideSilo`, `OxideIpPool`, `OxideSubnetPool`) require a
-fleet-admin token.
+Oxide authenticates with a long-lived **device access token** (`Authorization: Bearer <token>`) supplied
+via a Kubernetes Secret each generated `<Kind>Configuration` references. The token's scope decides what you
+can manage: a silo-collaborator token covers projects and everything inside them; the fleet resources
+(`OxideSilo`, `OxideIpPool`, `OxideSubnetPool`) need a fleet-admin token.
 
 ## Install
 
 ```bash
-# 1. The token Secret (see above).
+# 1. The token Secret.
 kubectl create secret generic oxide-api-token \
   --from-literal=token="$(oxide auth status --token)" -n krateo-system
 
 # 2. The operator layer (RestDefinitions + ConfigMaps).
-helm upgrade --install oxide-kog ./chart -n krateo-system \
-  --set oxide.apiUrl=https://oxide.example.com
+helm upgrade --install oxide-kog \
+  oci://ghcr.io/krateo-blueprints/charts/krateo-oxide-operator-kog \
+  -n krateo-system --set oxide.apiUrl=https://oxide.example.com
 
-# 3. The per-Kind Configuration CRs (token wiring) and some example resources.
+# 3. The per-Kind Configuration CRs (token wiring).
 kubectl apply -f chart/samples/00-configurations.yaml
-kubectl apply -f chart/samples/10-project-and-instance.yaml
 ```
 
-Disable resources you don't need (or lack token scope for) via values:
+Or install through a Krateo `Composition`: `kubectl apply -f compositiondefinition.yaml` then
+`kubectl apply -f examples/composition.yaml`. Full walkthrough with screenshots:
+[docs/quickstart.md](docs/quickstart.md). Condensed reference: [docs/usage.md](docs/usage.md).
+
+## Configure
+
+The key input is `oxide.apiUrl` (your silo endpoint, no trailing slash). Disable resources you don't need
+or lack token scope for via the per-resource toggles:
 
 ```bash
-helm upgrade --install oxide-kog ./chart -n krateo-system \
-  --set oxide.apiUrl=https://oxide.example.com \
+helm upgrade --install oxide-kog \
+  oci://ghcr.io/krateo-blueprints/charts/krateo-oxide-operator-kog \
+  -n krateo-system --set oxide.apiUrl=https://oxide.example.com \
   --set restDefinitions.silo.enabled=false \
   --set restDefinitions.ippool.enabled=false \
   --set restDefinitions.subnetpool.enabled=false
 ```
 
-## What's in here
+Enable the OxideInstance convergence plugin (`--set instancePlugin.enabled=true`) to make an instance
+attach its boot disk and start on reconcile. The whole `values.yaml` surface — the Oxide target, the token
+contract, the 19 toggles, the resource group and the plugin — is documented in
+[docs/configuration.md](docs/configuration.md); it is typed by `chart/values.schema.json`.
 
-```
-chart/
-  Chart.yaml
-  values.yaml                 # oxide.apiUrl + token Secret + per-resource toggles
-  values.schema.json
-  assets/                     # one curated OAS subset per resource (19 files)
-    project.yaml instance.yaml disk.yaml ... subnetpool.yaml
-  templates/
-    _helpers.tpl
-    configmaps.yaml           # embeds each asset (tpl-resolves oxide.apiUrl)
-    rd-<key>.yaml             # one RestDefinition per resource (19 files)
-  samples/
-    00-configurations.yaml    # the <Kind>Configuration CRs (token wiring)
-    10-project-and-instance.yaml
-compositiondefinition.yaml    # points at oci://ghcr.io/krateo-blueprints/charts/...
-examples/composition.yaml
-docs/ARCHITECTURE.md
-```
+## Examples
 
-## Releasing
+- [examples/oxide-project-instance](examples/oxide-project-instance/README.md) — install the KOG, wire the
+  token, then declare a project, VPC, disk and instance as native Kubernetes resources that reconcile to
+  `READY=True`.
+- [examples/composition.yaml](examples/composition.yaml) — the `KrateoOxideOperatorKog` Composition CR
+  that installs the operator layer through Krateo.
+- `chart/samples/` — the ready-made `<Kind>Configuration` CRs and an end-to-end resource set.
+
+Index: [docs/examples.md](docs/examples.md).
+
+## Docs
+
+- [docs/index.md](docs/index.md) — the map of the whole bundle.
+- [docs/overview.md](docs/overview.md) — the KOG pipeline, the resources, the RestDefinition rationale, the
+  instance plugin.
+- [docs/usage.md](docs/usage.md) — install, wire the token, declare resources, verify.
+- [docs/configuration.md](docs/configuration.md) — the whole `values.yaml` surface.
+- [docs/api.md](docs/api.md) — the generated `<Kind>` / `<Kind>Configuration` CRDs and the
+  `CompositionDefinition`.
+- [docs/examples.md](docs/examples.md) — the runnable examples.
+- [docs/release.md](docs/release.md) — how the chart ships.
+- [docs/log.md](docs/log.md) — curated history.
+- [docs/quickstart.md](docs/quickstart.md) — the end-to-end walkthrough with screenshots.
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — the long-form architecture note.
+
+## Develop & release
 
 The chart is published to `oci://ghcr.io/krateo-blueprints/charts/krateo-oxide-operator-kog` by
-`.github/workflows/release-chart.yaml` on a SemVer git tag matching `chart/Chart.yaml`'s `version`
-(e.g. `0.1.0`). The `CompositionDefinition` `spec.chart.url`/`version` point at that artifact.
-
-## License
-
-Apache-2.0 — see [LICENSE](LICENSE).
+`.github/workflows/release-chart.yaml` on a SemVer git tag matching `chart/Chart.yaml`'s `version` (e.g.
+`0.1.0`, no `v` prefix); the workflow guards that the tag equals the chart version, `helm lint`s,
+`helm package`s and pushes to GHCR. After publishing, bump `compositiondefinition.yaml`'s
+`spec.chart.version` to the released version. `appVersion` records the Oxide Region API version the OAS
+subsets were curated against — regenerate the assets to track a newer API (see
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)). The `lint.yaml` workflow runs the shared docs-standard
+linter on every push and PR. Full runbook: [docs/release.md](docs/release.md). Licensed Apache-2.0
+([LICENSE](LICENSE)).
