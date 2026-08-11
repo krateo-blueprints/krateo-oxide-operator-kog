@@ -68,7 +68,7 @@ kubectl -n krateo-system rollout status deploy/oasgen-provider
 ## 3. Install the operator layer
 
 ```bash
-helm install oxide-kog oci://ghcr.io/braghettos/charts/krateo-oxide-operator-kog \
+helm install oxide-kog oci://ghcr.io/krateo-blueprints/charts/krateo-oxide-operator-kog \
   -n krateo-system --set oxide.apiUrl=https://oxide.example.com \
   --set instancePlugin.enabled=true
 ```
@@ -94,7 +94,7 @@ If you lack fleet-admin scope, disable the fleet resources:
 Each generated `<Kind>Configuration` references the token Secret. Apply the ready-made set:
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/braghettos/krateo-oxide-operator-kog/main/chart/samples/00-configurations.yaml
+kubectl apply -f https://raw.githubusercontent.com/krateo-blueprints/krateo-oxide-operator-kog/main/chart/samples/00-configurations.yaml
 ```
 
 ## 5. Declare a project, VPC, disk and instance

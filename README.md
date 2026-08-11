@@ -127,14 +127,14 @@ chart/
   samples/
     00-configurations.yaml    # the <Kind>Configuration CRs (token wiring)
     10-project-and-instance.yaml
-compositiondefinition.yaml    # points at oci://ghcr.io/braghettos/charts/...
+compositiondefinition.yaml    # points at oci://ghcr.io/krateo-blueprints/charts/...
 examples/composition.yaml
 docs/ARCHITECTURE.md
 ```
 
 ## Releasing
 
-The chart is published to `oci://ghcr.io/braghettos/charts/krateo-oxide-operator-kog` by
+The chart is published to `oci://ghcr.io/krateo-blueprints/charts/krateo-oxide-operator-kog` by
 `.github/workflows/release-chart.yaml` on a SemVer git tag matching `chart/Chart.yaml`'s `version`
 (e.g. `0.1.0`). The `CompositionDefinition` `spec.chart.url`/`version` point at that artifact.
 
