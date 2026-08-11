@@ -28,7 +28,7 @@ annotations:
   krateo.io/maturity: beta
   krateoSupportedVersion: ">= 2.5.1"
 sources:
-  - https://github.com/braghettos/krateo-oxide-operator-kog
+  - https://github.com/krateo-blueprints/krateo-oxide-operator-kog
   - https://github.com/oxidecomputer/omicron/tree/main/openapi/nexus
   - https://github.com/krateoplatformops/oasgen-provider
   - https://github.com/krateoplatformops/rest-dynamic-controller
