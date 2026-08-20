@@ -6,4 +6,4 @@ metadata:
 spec:
   chart:
     url: oci://ghcr.io/krateo-blueprints/charts/krateo-oxide-operator-kog
-    version: "0.1.2"
+    version: CHART_VERSION
