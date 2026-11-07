@@ -99,11 +99,12 @@ Index: [docs/examples.md](docs/examples.md).
 
 ## Develop & release
 
-The chart is published to `oci://ghcr.io/krateo-blueprints/charts/krateo-oxide-operator-kog` by
-`.github/workflows/release-tag.yaml` on a SemVer git tag matching `chart/Chart.yaml`'s `version` (e.g.
-`0.1.0`, no `v` prefix); the workflow guards that the tag equals the chart version, `helm lint`s,
-`helm package`s and pushes to GHCR. After publishing, bump `compositiondefinition.yaml`'s
-`spec.chart.version` to the released version. `appVersion` records the Oxide Region API version the OAS
+On a SemVer git tag (e.g. `0.1.4`, no `v` prefix) `.github/workflows/release-tag.yaml` stamps the
+`CHART_VERSION` placeholder in `chart/Chart.yaml` and `compositiondefinition.yaml` from the tag, pushes the
+chart to `oci://ghcr.io/krateo-blueprints/charts/krateo-oxide-operator-kog`, and publishes the same archive
+to the Marketplace's `blueprints` index (`https://krateo-blueprints.github.io/charts/blueprints`), per the
+organisation's publishing standard (krateo-blueprints/charts `PUBLISHING.md`). Nothing is bumped by hand.
+`appVersion` records the Oxide Region API version the OAS
 subsets were curated against — regenerate the assets to track a newer API (see
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)). The `lint.yaml` workflow runs the shared docs-standard
 linter on every push and PR. Full runbook: [docs/release.md](docs/release.md). Licensed Apache-2.0
