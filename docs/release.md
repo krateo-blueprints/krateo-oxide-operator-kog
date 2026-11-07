@@ -32,7 +32,7 @@ placeholder, and the tag is the only place a version is written.
    and `values.schema.json`, and `Chart.yaml` must have an https `icon` and `keywords`.
 4. **Pushes** it to `oci://ghcr.io/krateo-blueprints/charts/krateo-oxide-operator-kog:<tag>`.
 5. **Publishes** the same archive to the `blueprints` index through the organisation's publisher
-   (`krateo-blueprints/charts/.github/workflows/publish-chart.yaml@1`), which succeeds only once the
+   (`krateo-blueprints/charts/.github/workflows/publish-chart.yaml`, pinned per its rule 9), which succeeds only once the
    served index lists the version and `helm pull --repo` installs it anonymously.
 6. **Attaches** the stamped `compositiondefinition.yaml` to the GitHub release for the tag.
 
