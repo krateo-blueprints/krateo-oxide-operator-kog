@@ -15,7 +15,6 @@ appVersion: "2026060800.0.0"
 home: https://oxide.computer/
 icon: https://raw.githubusercontent.com/krateo-platformops/krateo/main/docs/media/logo.svg
 keywords:
-  - krateo
   - kog
   - oasgen-provider
   - oxide

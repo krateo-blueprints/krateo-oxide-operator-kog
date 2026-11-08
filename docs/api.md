@@ -150,5 +150,6 @@ So a `Composition` CR is `composition.krateo.io/v0-1-0`, kind `KrateoOxideOperat
 `values.yaml` ([configuration](./configuration.md)). `examples/composition.yaml` is a ready instance —
 see [examples](./examples.md).
 
-`spec.chart.version` must be a published chart version; bump it to the released tag after publishing
+`spec.chart.version` must be a published chart version. The committed file carries the `CHART_VERSION`
+placeholder; the release stamps it from the tag and attaches the stamped copy to the GitHub release
 ([release](./release.md)).

@@ -1,51 +1,58 @@
 ---
 type: Runbook
 title: krateo-oxide-operator-kog — release
-description: How the chart ships — one SemVer git tag matching Chart.yaml drives helm package and push to GHCR, then bump the CompositionDefinition to the published version.
+description: How the chart ships — one bare-semver git tag stamps the version, pushes the chart to GHCR and publishes the same archive to the Marketplace's blueprints index, per the organisation's publishing standard.
 resource: oci://ghcr.io/krateo-blueprints/charts/krateo-oxide-operator-kog
 tags: [release, oci, ghcr, helm, runbook]
-timestamp: 2026-08-11T00:00:00Z
+timestamp: 2026-11-07T00:00:00Z
 ---
 
 # Release
 
-The chart is published to `oci://ghcr.io/krateo-blueprints/charts/krateo-oxide-operator-kog` by
-`.github/workflows/release-chart.yaml`.
+The chart is published by `.github/workflows/release-tag.yaml`, twice and with the same bytes, as the
+organisation's publishing standard requires
+([krateo-blueprints/charts PUBLISHING.md](https://github.com/krateo-blueprints/charts/blob/main/PUBLISHING.md)):
+to `oci://ghcr.io/krateo-blueprints/charts/krateo-oxide-operator-kog`, and to the Marketplace's
+`blueprints` index at `https://krateo-blueprints.github.io/charts/blueprints`, which is what the portal
+Marketplace installs from.
 
 ## What a tag ships
 
-A push of a **SemVer git tag** matching `[0-9]+.[0-9]+.[0-9]+` (e.g. `0.1.0`, **no** `v` prefix), or a
-manual `workflow_dispatch`, runs the `release-chart` workflow:
+A push of a **SemVer git tag** matching `[0-9]+.[0-9]+.[0-9]+` (e.g. `0.1.4`, **no** `v` prefix) runs the
+workflow. The committed `chart/Chart.yaml` and `compositiondefinition.yaml` carry the `CHART_VERSION`
+placeholder, and the tag is the only place a version is written.
 
-1. `helm lint chart/` — validates the chart and its `values.schema.json`.
-2. **Tag-vs-version guard** — on a tag push, the tag must equal `chart/Chart.yaml`'s `version`, or the
-   job fails. So the tag you push and the chart version are always the same.
-3. `helm package chart/` — `helm package` does not render templates, so a chart requiring runtime input
-   (`oxide.apiUrl`) still packages cleanly.
-4. `helm registry login ghcr.io` with `GITHUB_TOKEN`, then `helm push` to
-   `oci://ghcr.io/<owner>/charts` — the owner namespace is derived from the repository owner
-   (`GITHUB_TOKEN` can only write its own namespace), with a 5-attempt retry for GHCR first-push
-   flakiness.
+1. **Refuses to start** unless the tagged commit has a successful `lint` run and the org secret
+   `CHARTS_PUBLISH_TOKEN` is set, so nothing reaches GHCR that cannot also reach the Marketplace.
+2. **Stamps** `CHART_VERSION` in `compositiondefinition.yaml` and `chart/Chart.yaml` from the tag.
+3. **Packages and checks** the chart. It is a blueprint (it has a `values.schema.json` and a
+   `CompositionDefinition`), so the stamped `compositiondefinition.yaml` is copied into the chart root
+   before `helm package`, and the archive itself is checked: it must hold `compositiondefinition.yaml`
+   (installing `oci://ghcr.io/krateo-blueprints/charts/krateo-oxide-operator-kog` at the tag's version)
+   and `values.schema.json`, and `Chart.yaml` must have an https `icon` and `keywords`.
+4. **Pushes** it to `oci://ghcr.io/krateo-blueprints/charts/krateo-oxide-operator-kog:<tag>`.
+5. **Publishes** the same archive to the `blueprints` index through the organisation's publisher
+   (`krateo-blueprints/charts/.github/workflows/publish-chart.yaml`, pinned per its rule 9), which succeeds only once the
+   served index lists the version and `helm pull --repo` installs it anonymously.
+6. **Attaches** the stamped `compositiondefinition.yaml` to the GitHub release for the tag.
 
 ## Steps
 
-Bump `chart/Chart.yaml`'s `version` on `main`, then tag it to match:
-
 ```console
-$ git tag 0.1.0 && git push origin 0.1.0
+$ git tag 0.1.4 && git push origin 0.1.4
 ```
 
-Verify the workflow went green and the artifact exists:
+Verify the workflow went green and both copies exist:
 
 ```console
-$ helm show chart oci://ghcr.io/krateo-blueprints/charts/krateo-oxide-operator-kog --version 0.1.0 | head -3
+$ helm show chart oci://ghcr.io/krateo-blueprints/charts/krateo-oxide-operator-kog --version 0.1.4 | head -3
+$ helm pull krateo-oxide-operator-kog --version 0.1.4 --repo https://krateo-blueprints.github.io/charts/blueprints
 ```
 
 ## After publishing
 
-Bump `compositiondefinition.yaml`'s `spec.chart.version` to the published version on `main` — it is this
-blueprint's own registration and must point at a chart version that exists ([api](./api.md)). The url
-`oci://ghcr.io/krateo-blueprints/charts/krateo-oxide-operator-kog` already matches the release namespace.
+Nothing is bumped by hand. Apply the stamped `compositiondefinition.yaml` attached to the release (not the
+branch copy, which carries the placeholder) to register this version ([api](./api.md)).
 
 ## The Oxide API version
 
